@@ -1,3 +1,4 @@
 tabs: ["src/components/Header.jsx", "src/App.jsx"]
 terminals: ["bun install && bun run dev"]
+playground-view: terminal-editor-browser
 run-button: bun run dev
