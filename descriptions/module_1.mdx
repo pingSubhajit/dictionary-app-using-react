@@ -1,0 +1,150 @@
+React Dictionary Builder: Getting Started
+=========================================
+
+Project Introduction:
+---------------------
+
+Welcome to the Dictionary Application using React project, where we'll guide you through the process of building a dynamic dictionary application using React and a third-party API. In this first segment, "Getting Started," our goal is to set up the foundational structure of our project by creating a header component with a logo, adding styling, and incorporating it into the main application.
+
+Brief on React and Project Requirements:
+----------------------------------------
+
+React is a JavaScript library for building user interfaces, allowing developers to create reusable UI components. To ensure the best experience out of this project, you need have some fundamental understanding of HTML and Javascript. Extensive knowledge of CSS is not required as styling is quire subjective topic and we will guide you through the styling process for this project, but a basic understanding of CSS is preferable.
+
+## Boilerplate code
+In this project,  we have already set up the initial project files and components to get you started. We are using Vite here. Vite is a build tool that aims to provide fast and efficient development and production builds for modern web applications. We already have a `<Header />` component, which is a blank function currently and an App component which contains the rest of our application's code.
+
+## What will you do
+In this step you are tasked to create the `<Header />` component with a logo that you are provided. And then we will add the component into our main application
+
+Step-by-Step Guide:
+-------------------
+
+### 1\. Create Header Component (`/src/components/Header.jsx`) :
+Head into the `/src/components/Header.jsx` file that you have been provided. Currently `Header` is an empty function. Make the function return the block of code as shown below:
+```jsx
+// /src/components/Header.jsx
+
+<header className='header'>
+	<img src={dictionaryLogo} alt='Dictionary Logo' className='header__logo' />
+</header>
+```
+With that added, our function should look like this:
+```jsx
+// /src/components/Header.jsx
+
+const Header = () => {
+	 return (
+		 <header className='header'>
+			 <img src={dictionaryLogo} alt='Dictionary Logo' className='header__logo' />
+		 </header>
+	 )
+ }
+```
+At this point, you will run into an error saying `dictionaryLogo is not defined`. Quite naturally so, as we should have imported our logo as `dictionaryLogo` before trying to use it. Let's import it now. Add the following statement at the top of the file:
+```js
+// /src/components/Header.jsx
+
+import dictionaryLogo from '/dictionary.svg'
+```
+
+### 2\. Add Data-testid Attribute (`/src/components/Header.jsx`) :
+
+A vital part of application development is testing.  Testing is crucial as it helps ensure the reliability, stability, and maintainability of the application. React applications are often composed of numerous components that interact with each other, handling user interfaces and state management. Tests allow developers to verify that individual components function as expected, catching bugs early in the development process.
+
+We need to be able to test the `<Header />` component that we just created. And we do these testings by creating test script that run automatically as it gets almost impossible to manually test every single components as our project grows. So we need some way for our test script to identify our `<Header />` component for it to be able to test it.
+
+That's why we will add `data-testid='header'` to the `<header>` element in our component
+```jsx
+// /src/components/Header.jsx
+
+<header data-testid='header' className='header'>
+	<img src={dictionaryLogo} alt='Dictionary Logo' className='header__logo' />
+</header>
+```
+
+### 3\. Create Header.css (`/src/components/Header.css`) :
+
+Styling plays a crucial role in shaping the visual presentation and user experience of a website or web application.  We want our applications to look good and appealing to our users. Cascading Style Sheets (CSS) is the primary language used for styling in the web, allowing developers to control layout, colors, fonts, and other design aspects.
+
+Create a `Header.css` file inside `/src/components` and add some styles.
+```css
+/* /src/components/Header.css */
+
+.header {
+  padding: 3rem 0;
+}
+
+.header__logo {
+  max-width: 3rem;
+}
+```
+
+### 4\. Import Header.css (`/src/components/Header.jsx`) :
+Now we have created some styling rules in our `/src/components/Header.css` file. But to see these rules in action, we need to first import the file into our `<Header />` component
+
+Import the `Header.css` file in the `Header.jsx` file to apply the styles.
+```js
+// /src/components/Header.jsx
+
+import dictionaryLogo from '/dictionary.svg'
+import './Header.css'
+
+// ... (existing code)
+```
+
+### 5\. Import and Add Header in App.jsx (`/src/App.jsx`) :
+Now that our `<Header />` component is ready, we are all set to include the component into our main application. To do that, header to `/src/App.jsx`. There you will see that we are returning an `<h1>` element with the text "elcome to Dictionary Application using React" within a `<main>` element.
+
+First, let's import the `<Header />` component into the `<App />` component.
+
+```js
+// /src/components/Header.jsx
+
+import Header from './components/Header.jsx'
+```
+
+And now let's use the component into our main application
+```jsx
+// /src/components/Header.jsx
+
+function App() {
+	return (
+		<main>
+			<Header />
+			<h1>Welcome to Dictionary Application using React</h1>
+		</main>
+	)
+}
+
+export default App
+ ```
+
+### 6\. Add Styles to App.css (`/src/App.css`) :
+The `<App />` component is the component that acts as the parent component of our whole application. So to style the whole application, basically to use some global styles, we will write the rules in our `/src/App.css` file and import it into our `<App />` component.
+
+Now let's head to the `/src/App.css` file and add the following style rules
+
+```css
+/* /src/App.css */
+
+main {
+  margin: auto;
+  max-width: 48rem;
+  padding: 0 3rem;
+}
+```
+And finally to apply the styles, let's import the CSS file into our `<App />` component.
+```js
+// /src/components/Header.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+
+// ... (existing code)
+```
+
+Conclusion:
+-----------
+
+Congratulations! You've successfully completed the "Getting Started" segment. Your React application now has a header component with a logo and styles. In the upcoming segments, we'll dive deeper into building the search functionality and enhancing the user interface. Happy coding!
