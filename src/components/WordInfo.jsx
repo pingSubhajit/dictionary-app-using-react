@@ -1,15 +1,15 @@
 import './WordInfo.css'
 
 const WordInfo = ({definition, loading}) => {
-    if (!definition) return (
-        <div className='default-display'>
-            <h1 className='default-display__title'>Search for a word to get its definition</h1>
-        </div>
-    )
-
     if (loading) return (
         <div className='default-display'>
             <h1 className='default-display__title'>Loading...</h1>
+        </div>
+    )
+
+    if (!definition) return (
+        <div className='default-display'>
+            <h1 className='default-display__title'>Search for a word to get its definition</h1>
         </div>
     )
 
