@@ -2,6 +2,7 @@ import Header from './components/Header.jsx'
 import './App.css'
 import {useState} from 'react'
 import Search from './components/Search.jsx'
+import {getDefinitionByWord} from './lib/getDefinitionByWord.js'
 
 function App() {
 	const [searchValue, setSearchValue] = useState('')
