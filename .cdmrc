@@ -1,4 +1,4 @@
-tabs: ["src/App.jsx", "src/components/WordInfo.jsx"]
+tabs: ["src/lib/getDefinitionByWord.js", "src/components/WordInfo.jsx", "src/App.jsx"]
 terminals: ["bun install && bun run dev"]
 playground-view: terminal-editor-browser
 run-button: bun run dev
