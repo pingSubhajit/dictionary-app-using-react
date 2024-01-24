@@ -1,0 +1,445 @@
+
+## Segment Introduction:
+
+Welcome to the second segment, "Building the Search Component," of the Dictionary Application using React project. In this stage, we will create the search functionality for our dictionary application. This involves setting up a state to manage the search value, creating a Search component, styling it, and integrating it into the main application.
+
+## Step-by-Step Guide:
+
+### 1\. Create 'searchValue' State (`/src/App.jsx`) :
+
+In React, states are vital for building interactive user interfaces. They represent dynamic data that can change over time, allowing components to respond to user actions. By using the `useState` hook or class component state, developers can efficiently manage and update a component's state, triggering UI changes in response to events like button clicks or form submissions. This dynamic behavior enhances interactivity, as React optimally re-renders only the affected parts of the UI, ensuring a responsive user experience. That means if a value of a state changes, the UI would automatically update itself without the need of a full page reload.
+
+We want to store the word the user wants to search for in a React state and update the state as the user types in their input. For that we need to create a state named `searchValue` in our `/src/App,jsx` component.
+
+To create a state, we first need to import the `useState` hook from React
+```js
+// /src/App.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+```
+And then add the following block to the `<App />` component
+
+```jsx
+// /src/App.jsx
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+
+	// ... (existing code)
+}
+
+export default App
+```
+
+### 2\. Create Search Component (`/src/components/Search.jsx`) :
+Now we will create the `<Search />` component. This component will contain our search input box, and our search button. To create that, create a file named `Search.jsx` in `/src/components/` directory and add the following code to it:
+```jsx
+const Search = ({searchValue, setSearchValue}) => {
+	return (
+		<div className='search'>
+			<input
+				value={searchValue}
+				type="text"
+				placeholder='Search for a word'
+				className='search__input'
+			/>
+			<button type="submit" className='search__button'>
+				<img src={searchIcon} alt='Search icon' className='search__button__icon' />
+			</button>
+		</div>
+	)
+}
+
+export default Search
+```
+Notice that we are destructuring two variables called `searchValue` and `setSearchValue` from the parameter of our `Search` component function. These are called props or component properties. This is how we pass down data from parent components to child components in React. We will use the `<Search />` component within our `<App />` component and if you remember, we have our `searchValue` state in the `<App />` component. In `<Search />` component, by accepting and using these two props, we are expecting they will be provided by the parent component wherever the `<Search />` component will be used.
+
+At this point, you will run into an error saying `searchIcon is not defined` and quite righly so. We are using the `searchIcon` variable without in our `<img>` element without importing it first. Let's import it now. Add the following line at the top of your file:
+```js
+// /src/components/Search.jsx
+
+import searchIcon from '/searchIcon.svg'
+
+// ... (existing code)
+```
+### 3\. Add data-testid Attribute (`/src/components/Search.jsx`) :
+
+Just like we previously did, to be able to test our `<Search />` component easily and efficiently, we need a way to identify our `<Search />` component. For that, let's add `data-testid="search"` to the root element of our component, which is a `<div>` element
+
+```jsx
+// /src/components/Search.jsx
+
+const Search = ({searchValue, setSearchValue}) => {
+	return (
+		<div data-testid="search" className='search'>
+			// ... (existing code)
+		</div>
+	)
+}
+
+export default Search
+```
+
+### 4\. Create Search.css (`/src/components/Search.css`) :
+
+Just like our `<Header />` component, we need to style our `<Search />` component to make it look good. To do that, create a `Search.css` file in `/src/components/` directory and add the following styles to it:
+
+```css
+/* /src/components/Search.css */
+
+.search {
+  background: #f1f1f1;
+  border-radius: 0.5rem;
+  display: flex;
+  /*align-items: center;*/
+}
+
+.search__input {
+  outline: none;
+  border: none;
+  background: none;
+  padding: 1.25rem;
+  font-size: 1.25rem;
+  font-family: Georgia Serif;
+  font-weight: bold;
+  width: 100%;
+}
+
+.search__button {
+  border: none;
+  background: none;
+  padding: 0 1.25rem;
+  margin-left: auto;
+}
+
+.search__button__icon {
+  width: 1.5rem;
+}
+```
+
+And now to apply the styling, let's import the CSS file into our `<Seearch />` component
+
+```js
+// /src/components/Search.jsx
+
+import searchIcon from '/searchIcon.svg'
+import './Search.css'
+
+// ... (existing code)
+```
+
+
+### 6\. Create handleSearchInputChange Function (`/src/components/Search.jsx`) :
+
+Now that our component is now styled, even if you import and user the `<Search />` component in our `<App />` component and try to type something in it, you can't. That's because our input field is wired to have the value of `searchValue` state which is an empty string. We need a way to update the `searchValue` state with the value the user enters as the user types in the input field. That's where the `setSearchValue` function comes into play. It takes the new value as an argument and updates the `searchValue` state with it.
+
+To use this, we will create a function named `handleSearchInputChanges` within our `<Search />` component which will call the `setSearchValue` function with the user entered value as an argument. The `setSearchValue` function will then update the `searchValue` state with the user entered value and the input the field will display it. So let's create the `handleSearchInputChanges` function now:
+```jsx
+// /src/components/Search.jsx
+
+const Search = ({searchValue, setSearchValue}) => {
+		const handleSearchInputChanges = (e) => {
+			setSearchValue(e.target.value)
+		}
+
+		return (
+			<div data-testid="search" className='search'>
+				// ... (existing code)
+			</div>
+		)
+ }
+
+export default Search
+```
+
+### 7\. Bind handleSearchInputChange to onChange (`/src/components/Search.jsx`) :
+
+Now we will need to call the `handleSearchInputChanges` when the value of the input field changes. For that we will use the `onChange` event listener and bind our `handleSearchInputChanges` function to it:
+```jsx
+// /src/components/Search.jsx
+
+// ... (existing code)
+<input
+	value={searchValue}
+	onChange={handleSearchInputChanges}
+	type="text"
+	placeholder='Search for a word'
+	className='search__input'
+/>
+// ... (existing code)
+```
+And just like that, our `<Search />` component is up and ready.
+
+### 8\. Import Search in App.jsx (`/src/App.jsx`) :
+
+Now we just need to import and use the `<Search />` component in our main `<App />` component. First, let's import it:
+```js
+// /src/components/Search.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
+
+// ... (existing code)
+```
+
+Now let's use the component. Add the following line after where you have used the `<Header />` component:
+```jsx
+// /src/components/Search.jsx
+
+// ... (existing code)
+<Header />
+<Search searchValue={searchValue} setSearchValue={setSearchValue} />
+// ... (existing code)
+```
+
+At the end, the `/src/App.jsx` file should look like this:
+```jsx
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+
+	return (
+		<main>
+			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} />
+			<h1>Welcome to Dictionary Application using React</h1>
+		</main>
+	)
+}
+
+export default App
+```
+
+## Conclusion:
+
+Great job! You've successfully built the search component for your Dictionary Application using React project. The search input now updates the `searchValue` state in real-time. In the next segment, we'll focus on implementing the data fetching logic to retrieve word information from a third-party API. Keep up the good work!
+## Segment Introduction:
+
+Welcome to the second segment, "Building the Search Component," of the Dictionary Application using React project. In this stage, we will create the search functionality for our dictionary application. This involves setting up a state to manage the search value, creating a Search component, styling it, and integrating it into the main application.
+
+## Step-by-Step Guide:
+
+### 1\. Create 'searchValue' State (`/src/App.jsx`) :
+
+In React, states are vital for building interactive user interfaces. They represent dynamic data that can change over time, allowing components to respond to user actions. By using the `useState` hook or class component state, developers can efficiently manage and update a component's state, triggering UI changes in response to events like button clicks or form submissions. This dynamic behavior enhances interactivity, as React optimally re-renders only the affected parts of the UI, ensuring a responsive user experience. That means if a value of a state changes, the UI would automatically update itself without the need of a full page reload.
+
+We want to store the word the user wants to search for in a React state and update the state as the user types in their input. For that we need to create a state named `searchValue` in our `/src/App,jsx` component.
+
+To create a state, we first need to import the `useState` hook from React
+```js
+// /src/App.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+```
+And then add the following block to the `<App />` component
+
+```jsx
+// /src/App.jsx
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+
+	// ... (existing code)
+}
+
+export default App
+```
+
+### 2\. Create Search Component (`/src/components/Search.jsx`) :
+Now we will create the `<Search />` component. This component will contain our search input box, and our search button. To create that, create a file named `Search.jsx` in `/src/components/` directory and add the following code to it:
+```jsx
+const Search = ({searchValue, setSearchValue}) => {
+	return (
+		<div className='search'>
+			<input
+				value={searchValue}
+				type="text"
+				placeholder='Search for a word'
+				className='search__input'
+			/>
+			<button type="submit" className='search__button'>
+				<img src={searchIcon} alt='Search icon' className='search__button__icon' />
+			</button>
+		</div>
+	)
+}
+
+export default Search
+```
+Notice that we are destructuring two variables called `searchValue` and `setSearchValue` from the parameter of our `Search` component function. These are called props or component properties. This is how we pass down data from parent components to child components in React. We will use the `<Search />` component within our `<App />` component and if you remember, we have our `searchValue` state in the `<App />` component. In `<Search />` component, by accepting and using these two props, we are expecting they will be provided by the parent component wherever the `<Search />` component will be used.
+
+At this point, you will run into an error saying `searchIcon is not defined` and quite righly so. We are using the `searchIcon` variable without in our `<img>` element without importing it first. Let's import it now. Add the following line at the top of your file:
+```js
+// /src/components/Search.jsx
+
+import searchIcon from '/searchIcon.svg'
+
+// ... (existing code)
+```
+### 3\. Add data-testid Attribute (`/src/components/Search.jsx`) :
+
+Just like we previously did, to be able to test our `<Search />` component easily and efficiently, we need a way to identify our `<Search />` component. For that, let's add `data-testid="search"` to the root element of our component, which is a `<div>` element
+
+```jsx
+// /src/components/Search.jsx
+
+const Search = ({searchValue, setSearchValue}) => {
+	return (
+		<div data-testid="search" className='search'>
+			// ... (existing code)
+		</div>
+	)
+}
+
+export default Search
+```
+
+### 4\. Create Search.css (`/src/components/Search.css`) :
+
+Just like our `<Header />` component, we need to style our `<Search />` component to make it look good. To do that, create a `Search.css` file in `/src/components/` directory and add the following styles to it:
+
+```css
+/* /src/components/Search.css */
+
+.search {
+  background: #f1f1f1;
+  border-radius: 0.5rem;
+  display: flex;
+  /*align-items: center;*/
+}
+
+.search__input {
+  outline: none;
+  border: none;
+  background: none;
+  padding: 1.25rem;
+  font-size: 1.25rem;
+  font-family: Georgia Serif;
+  font-weight: bold;
+  width: 100%;
+}
+
+.search__button {
+  border: none;
+  background: none;
+  padding: 0 1.25rem;
+  margin-left: auto;
+}
+
+.search__button__icon {
+  width: 1.5rem;
+}
+```
+
+And now to apply the styling, let's import the CSS file into our `<Seearch />` component
+
+```js
+// /src/components/Search.jsx
+
+import searchIcon from '/searchIcon.svg'
+import './Search.css'
+
+// ... (existing code)
+```
+
+
+### 6\. Create handleSearchInputChange Function (`/src/components/Search.jsx`) :
+
+Now that our component is now styled, even if you import and user the `<Search />` component in our `<App />` component and try to type something in it, you can't. That's because our input field is wired to have the value of `searchValue` state which is an empty string. We need a way to update the `searchValue` state with the value the user enters as the user types in the input field. That's where the `setSearchValue` function comes into play. It takes the new value as an argument and updates the `searchValue` state with it.
+
+To use this, we will create a function named `handleSearchInputChanges` within our `<Search />` component which will call the `setSearchValue` function with the user entered value as an argument. The `setSearchValue` function will then update the `searchValue` state with the user entered value and the input the field will display it. So let's create the `handleSearchInputChanges` function now:
+```jsx
+// /src/components/Search.jsx
+
+const Search = ({searchValue, setSearchValue}) => {
+		const handleSearchInputChanges = (e) => {
+			setSearchValue(e.target.value)
+		}
+
+		return (
+			<div data-testid="search" className='search'>
+				// ... (existing code)
+			</div>
+		)
+ }
+
+export default Search
+```
+
+### 7\. Bind handleSearchInputChange to onChange (`/src/components/Search.jsx`) :
+
+Now we will need to call the `handleSearchInputChanges` when the value of the input field changes. For that we will use the `onChange` event listener and bind our `handleSearchInputChanges` function to it:
+```jsx
+// /src/components/Search.jsx
+
+// ... (existing code)
+<input
+	value={searchValue}
+	onChange={handleSearchInputChanges}
+	type="text"
+	placeholder='Search for a word'
+	className='search__input'
+/>
+// ... (existing code)
+```
+And just like that, our `<Search />` component is up and ready.
+
+### 8\. Import Search in App.jsx (`/src/App.jsx`) :
+
+Now we just need to import and use the `<Search />` component in our main `<App />` component. First, let's import it:
+```js
+// /src/components/Search.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
+
+// ... (existing code)
+```
+
+Now let's use the component. Add the following line after where you have used the `<Header />` component:
+```jsx
+// /src/components/Search.jsx
+
+// ... (existing code)
+<Header />
+<Search searchValue={searchValue} setSearchValue={setSearchValue} />
+// ... (existing code)
+```
+
+At the end, the `/src/App.jsx` file should look like this:
+```jsx
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+
+	return (
+		<main>
+			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} />
+			<h1>Welcome to Dictionary Application using React</h1>
+		</main>
+	)
+}
+
+export default App
+```
+
+## Conclusion:
+
+Great job! You've successfully built the search component for your Dictionary Application using React project. The search input now updates the `searchValue` state in real-time. In the next segment, we'll focus on implementing the data fetching logic to retrieve word information from a third-party API. Keep up the good work!
