@@ -1,5 +1,5 @@
-import dictionaryLogo from '/dictionary.svg';
-import './Header.css';
+import dictionaryLogo from '/dictionary.svg'
+import './Header.css'
 
 const Header = () => {
     return (
@@ -7,6 +7,6 @@ const Header = () => {
             <img src={dictionaryLogo} alt='Dictionary Logo' className='header__logo' />
         </header>
     )
-};
+}
 
-export default Header;
+export default Header

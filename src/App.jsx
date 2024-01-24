@@ -1,5 +1,5 @@
-import Header from "./components/Header.jsx";
-import "./App.css";
+import Header from './components/Header.jsx'
+import './App.css'
 
 function App() {
 	return (
@@ -7,7 +7,7 @@ function App() {
 			<Header />
 			<h1>Welcome to Dictionary Application using React</h1>
 		</main>
-	);
+	)
 }
 
-export default App;
+export default App
