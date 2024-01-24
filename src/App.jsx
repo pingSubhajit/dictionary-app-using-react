@@ -1,10 +1,15 @@
 import Header from './components/Header.jsx'
 import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
 
 function App() {
+	const [searchValue, setSearchValue] = useState('')
+
 	return (
 		<main>
 			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} />
 			<h1>Welcome to Dictionary Application using React</h1>
 		</main>
 	)
