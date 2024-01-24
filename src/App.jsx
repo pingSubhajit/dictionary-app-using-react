@@ -18,7 +18,7 @@ function App() {
 		<main>
 			<Header />
 			<Search searchValue={searchValue} setSearchValue={setSearchValue} onSearch={handleSearch} />
-			<WordInfo />
+			<WordInfo definition={searchResult} />
 		</main>
 	)
 }

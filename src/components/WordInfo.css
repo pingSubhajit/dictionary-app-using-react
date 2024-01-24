@@ -1,0 +1,53 @@
+.default-display {
+    margin-top: 3rem;
+}
+
+.default-display__title {
+    margin: auto;
+    text-align: center;
+    font-size: 2rem;
+    font-family: Brush Script MT;
+    font-weight: normal;
+}
+
+.word-info {
+    margin-top: 3rem;
+}
+
+.word-info__main_word {
+    font-size: 4rem;
+}
+
+.word-info__phonetic {
+    font-size: 1.5rem;
+}
+
+.word-info__definitions {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.word-info__definition {
+
+}
+
+.word-info__part-of-speech {
+    font-family: Brush Script MT;
+    font-weight: normal;
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.word-info__definition-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style-position: inside;
+    padding-left: 1.5rem;
+}
+
+.word-info__definition-item {
+    font-size: 1rem;
+}
