@@ -3,6 +3,7 @@ import './App.css'
 import {useState} from 'react'
 import Search from './components/Search.jsx'
 import {getDefinitionByWord} from './lib/getDefinitionByWord.js'
+import WordInfo from './components/WordInfo.jsx'
 
 function App() {
 	const [searchValue, setSearchValue] = useState('')
@@ -11,14 +12,13 @@ function App() {
 	const handleSearch = async (e) => {
 		const result = await getDefinitionByWord(searchValue)
 		setSearchResult(result)
-		console.log(result)
 	}
 
 	return (
 		<main>
 			<Header />
 			<Search searchValue={searchValue} setSearchValue={setSearchValue} onSearch={handleSearch} />
-			<h1 onClick={() => console.log(searchResult)}>Welcome to Dictionary Application using React</h1>
+			<WordInfo />
 		</main>
 	)
 }
