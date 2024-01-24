@@ -21,6 +21,7 @@
     background: none;
     padding: 0 1.25rem;
     margin-left: auto;
+    cursor: pointer;
 }
 
 .search__button__icon {
