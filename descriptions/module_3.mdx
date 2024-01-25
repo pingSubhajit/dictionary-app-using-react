@@ -1,0 +1,147 @@
+
+## Segment Introduction:
+
+Welcome to the third segment, "Implementing the Data Fetching Logic," of the Dictionary Application using React project. In this stage, we will focus on fetching word definitions from a dictionary API. We'll convert the existing `getDefinitionByWord` function into an asynchronous function, handle API calls, and update our application state with the search results.
+
+Connecting to a backend API or a third party server is one of the most common design pattern in frontend application development. Often times, there will be a server communicating with the database that handles, processes and stores all kinds of user requests whereas frontend works as a medium for the users to interact with the application. In that case the frontend needs to communicate with the backend to process user requests and display data.
+
+In this project, there is a backend server which takes user's query of a word and sends the meaning of that word in a structured format. We will connect to that backend server using its API and we will see how to send user's query to the server and how to fetch the response from the server.
+
+## Step-by-Step Guide:
+
+### 1\. Prepare the getDefinitionByWord Function (`/src/lib/getDefinitionByWord.js`):
+
+First, we will create an isolated function that takes a word as an argument and fetches the meaning of the word from the backend API. For that, you have already been given a file. Head to `/src/lib/getDefinitionByWord.js` and there you will see an empty function named `getDefinitionByWord` that takes `word` as an argument. First we need to make sure that we don't accidentally call the API and create a potential risk of error if no word or an empty string or such is provided to the `getDefinitionByWord` function.
+
+```js
+// /src/lib/getDefinitionByWord.js
+
+export const getDefinitionByWord =(word) => {
+	if (!word) return null
+}
+```
+Now, before we proceed further, we will need to know a little bit about asynchronous property of Javascript.
+Asynchronous code in refers to the execution of tasks that can occur independently of the main program flow. In contrast to synchronous code, where each operation is performed sequentially and blocks the execution until completion, asynchronous code allows other operations to proceed while waiting for certain tasks to finish. Asynchronous code is often implemented using callbacks, promises, and more recently, the `async/await` syntax. This approach enhances the efficiency of programs by enabling them to continue executing other tasks while waiting for non-blocking operations to complete, improving responsiveness and overall performance.
+
+The build in Javascript method `fetch` which is used to fetch data from an API is an async function. That means it returns a promise that is going to be either fulfilled or rejected in the future instead of returning the actual data immediately. We will use `fetch` in our `getDefinitionByWord` function and we want to wait for the fetch call to be finished and return the actual data before proceeding further in the function. We do that by using an `await` before our asynchronous function call, but to do that, we need to convert our main `getDefinitionByWord` function to an async function.
+
+```js
+// /src/lib/getDefinitionByWord.js
+
+export const getDefinitionByWord = async (word) => {
+	if (!word) return null
+}
+```
+Now we have a simple API to work with. The endpoint looks like this: `https://api.dictionaryapi.dev/api/v2/entries/en/<word>` where you have to replace the `<word>` in the end with the actual word you want to search for and you will be returned with its meanings. We will first fetch the data from this API. Fetch returns an API response object, which we need to convert to json using the `Response.prototype.json()` function which is also an async function. That means we need to await that as well. And in the end we need to return the data from the main `getDefinitionByWord` function. Let's see how the finalized code looks like:
+```js
+export const getDefinitionByWord = async (word) => {
+	if (!word) return null
+	return await (await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)).json()
+}
+```
+
+### 2\. Create searchResult State (`/src/App.jsx`) :
+
+Now head to the `/src/App,jsx` component. Here, just like we had created a state called `searchValue` for storing the value the user wants to search for, similarly we need to create another state called `searchResult` for storing the result returned from the `getDefinitionByWord` function after user searches for a word.
+
+```js
+// /src/App.jsx
+
+// ... (existing code)
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+	const [searchResult, setSearchResult] = useState(null)
+
+	// ... (existing code)
+}
+```
+
+### 3\. Implement handleSearch Async Function (`/src/App.jsx`) :
+
+Now let's create a function within the `<App />` component called `handleSearch`. The sole objective of this function is to call the `getDefinitionByWord` function with the `searchValue` as an argument and set the response as the `searchResult` state. Let's implement that.
+
+```js
+// /src/App.jsx
+
+// ... (existing code)
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+	const [searchResult, setSearchResult] = useState(null)
+
+	const handleSearch = async (e) => {
+		const result = await getDefinitionByWord(searchValue)
+		setSearchResult(result)
+		console.log(result)
+	}
+
+	// ... (existing code)
+}
+```
+
+### 4\. Pass handleSearch to Search Component (`/src/App.jsx`) :
+
+Now we want to call the `handleSearch` function when the user clicks on the search button. But remember that our search button resides in the `<Search />` component. So the `<Search />` component needs access to the `handleSearch` function. How do we do that? You guessed it. Props. We need to pass the `handleSearch` function as prop to the `<Search />` component. Let's do that now:
+```jsx
+// /src/App.jsx
+
+// ... (existing code)
+
+function App() {
+	// ... (existing code)
+
+	return (
+		<main>
+			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} onSearch={handleSearch} />
+			// ... (existing code)
+		</main>
+	)
+ }
+```
+
+### 5\. Accept onSearch Prop in Search Component (`/src/components/Search.jsx`) :
+Now we need to accept the `onSearch` prop in our `<Search />` component which currently only accepts `searchValue` and `setSearchValue` props. To accept our new prop, include it as well.
+
+```js
+// /src/components/Search.jsx
+
+// ... (existing code)
+
+const Search = ({searchValue, setSearchValue, onSearch}) => {
+
+	// ... (existing code)
+
+}
+```
+
+### 6\. Bind onSearch to Search Button Click Event (`/src/components/Search.jsx`) :
+
+And as the last step, we need to call the `onSearch` function when the search button is clicked. For that we will use an `onClick` event listener on our button element and bind the `onSearch` function to it.
+
+```jsx
+// /src/components/Search.jsx
+
+// ... (existing code)
+
+const Search = ({searchValue, setSearchValue, onSearch}) => {
+	// ... (existing code)
+
+	return (
+		// ... (existing code)
+
+		<button type="submit" className='search__button' onClick={onSearch}>
+			<img src={searchIcon} alt='Search icon' className='search__button__icon' />
+		</button>
+
+		// ... (existing code)
+	)
+}
+```
+
+## Conclusion:
+
+And just like that, our data fetching logic is fully implemented. At this point, if you toggle your browser console, type something in the search input and click on the search button, you will see an array of object pops up in the browser console consisting the meanings of your searched word. Later we will understand the structure of the data that is being returned to us and how to work with that.
+
+Fantastic! You've successfully implemented the data fetching logic in your Dictionary Application using React project. The application can now fetch word definitions based on user input. In the next segment, we'll proceed with building the WordInfo component to present the fetched information in an user-friendly manner. Keep up the good work!
