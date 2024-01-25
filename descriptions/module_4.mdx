@@ -1,0 +1,243 @@
+
+## Segment Introduction:
+
+In the fourth segment, "Building the WordInfo Component," of the Dictionary Application using React project, we'll focus on creating the WordInfo component to render detailed information about a word. We'll pass the search result as a prop and handle rendering based on whether a definition is available.
+
+## Step-by-Step Guide:
+
+### 1\. Pass searchResult as Definition Prop (`/src/App.jsx`) :
+
+For your convenience, a `<WordInfo />` component that returns a dummy text has already been created and used in the `<App />` component. If you inspect the `<WordInfo />` component in `/src/components/WordInfo.jsx` file, you will see that the component expects a `definition` prop. We need to pass the definiton object of the currently searched word in the `<WordInfo />` component. Luckily this is nothing but the data we stored in the `searchResult` state in the `<App />` component in the previous segement. So from `<App />` component, let's pass the `searchResult` state as the `definition` prop to the `<WordInfo />` component.
+
+```jsx
+// /src/App.jsx
+
+// ... (existing code)
+
+function App() {
+	// ... (existing code)
+
+	return (
+		<main>
+			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} onSearch={handleSearch} />
+			<WordInfo definition={searchResult} />
+			{/* Pass searchResult as the definition prop */}
+		</main>
+	)
+}
+
+export default App
+```
+
+### 2\. Render Default UI in WordInfo Component (`/src/components/WordInfo.jsx`) :
+
+Now if you head to the `<WordInfo />` component located in the `/src/components/WordInfo.jsx` file, you will notice that we will rely on the `definition` prop to display the information about the word. But we need to find a way to render some default message in case the `definition` prop is not provied or is empty. That is generally the case when the user hasn's searched for a specific word yet.
+
+To check that, add the following block in your `<WordInfo />` component before the return statement:
+```jsx
+// /src/components/WordInfo.jsx
+
+if (!definition) return (
+	<div className='default-display'>
+		<h1 className='default-display__title'>Search for a word to get its definition</h1>
+	</div>
+)
+```
+
+Now the `<WordInfo />` component should look like this:
+```jsx
+// /src/components/WordInfo.jsx
+
+const WordInfo = ({definition}) => {
+	if (!definition) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>Search for a word to get its definition</h1>
+		</div>
+	)
+
+    return (
+        <div className="word-info">
+            <h3>Example Definition</h3>
+        </div>
+    )
+}
+
+export default WordInfo
+```
+
+### 3\. Understanding the structure of the data returned by the API:
+Before working with the data returned from the API, we first need to understand the structure of it. If you inspect the data which was printed in our console in our previous segment, you will find the data kind of looks like this:
+```js
+[
+	{
+		word: 'example word',
+		phonetic: 'example phonetic',
+		meanings: [
+			{
+				partOfSpeech: 'example part of speech',
+				definitions: [
+					{
+						definition: 'example definition'
+					}
+				]
+			}
+		]
+	}
+ ]
+ ```
+We have an array of the possible search results of the word that we searched for. The first object from that array is usually the word we wanted to search for in the first place. So we will use the first object to display our data. In that object, the `word` key stores the word we searched for, the `phonetic` key holds the value of the phonetic of the word. The `meanings` ke is once again an array of objects. These objects are usage of the word as different parts of speech. Within these objects, `partOfSpeech` holds the value of the part of speech the word is being used as and the `definitions` array holds the definitions of that word as that part of speech. In the `definitions` array, the `definition` key in the objects hold the actual defintion of that word. A word can have multiple part of speech and each part of speech can have multiple definitions and we need to dynamically display all of that.
+
+### 4\. Render Word and Phonetic If Definition Is Provided (`/src/components/WordInfo.jsx`) :
+If `definition` prop is provided in the `WordInfo />` component, we want to first display the word and its phonetic. For that, remove the `<h3>Example Definition</h3>` element from the returned JSX and add the following JSX
+```jsx
+// /src/components/WordInfo.jsx
+
+// ... (existing code)
+
+return (
+	<div className="word-info">
+		<h1 className='word-info__main_word'>{definition[0].word}</h1>
+		<p className='word-info__phonetic'>{definition[0].phonetic}</p>
+	</div>
+)
+
+// ... (existing code)
+```
+Notice that we are using curly braces to display dynamic data in our JSX. That's how we display data that will be dynamically populated by Javascript in the runtime. We can run any javascript code and use its full power within the curly braces in the JSX
+
+### 5\. Loop Through Array of Meanings and Render Definitions (`/src/components/WordInfo.jsx`) :
+
+Now for the best part. We have to loop through `meanings` array and display each part of speech of the defintion and for each part of speech, we need to loop through the `definitions` array and display each definition.
+
+```jsx
+// /src/components/WordInfo.jsx
+
+// ... (existing code)
+
+<div className="word-info__definitions">
+	{definition[0].meanings.map((meaning, index) => (
+		<div key={index} className='word-info__definition'>
+			<h2 className='word-info__part-of-speech'>{meaning.partOfSpeech}</h2>
+			<ul className='word-info__definition-list'>
+				{meaning.definitions.map((def, index) => (
+					<li key={index} className='word-info__definition-item'>{def.definition}</li>
+				))}
+			</ul>
+		</div>
+	))}
+</div>
+
+// ... (existing code)
+```
+Note that we are using `Array.prototype.map()` function to loop through all element in an array. The `map` function gives us two things, in each loop, it gives the current element of that array and its index as the arguments for the callback function we provide the `map`. So here, in each loop we are returning a JSX element containing proper data for that particular element of that array. We are also adding the unique `index` property of that element as its JSX `key` prop. The `key` prop helps React keep track of the different elements in the DOM and is extremely important while mapping through an array and returning its corresponding JSX.
+
+At the end, our `<WordInfo />` component should look like this:
+```jsx
+// /src/components/WordInfo.jsx
+
+const WordInfo = ({definition}) => {
+	if (!definition) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>Search for a word to get its definition</h1>
+		</div>
+	)
+
+    return (
+        <div className="word-info">
+            <h1 className='word-info__main_word'>{definition[0].word}</h1>
+			<p className='word-info__phonetic'>{definition[0].phonetic}</p>
+
+			<div className="word-info__definitions">
+				{definition[0].meanings.map((meaning, index) => (
+					<div key={index} className='word-info__definition'>
+						<h2 className='word-info__part-of-speech'>{meaning.partOfSpeech}</h2>
+						<ul className='word-info__definition-list'>
+							{meaning.definitions.map((def, index) => (
+								<li key={index} className='word-info__definition-item'>{def.definition}</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</div>
+        </div>
+    )
+}
+
+export default WordInfo
+```
+
+### 6\. Create WordInfo.css for Styling (`/src/components/WordInfo.css`) :
+
+Now we need our `<WordInfo />` component to look good. For that, create a CSS file called `WordInfo.css` in `/src/components` directory and add the following styles to it:
+
+```css
+/* /src/components/WordInfo.css */
+
+.default-display {
+  margin-top: 3rem;
+}
+
+.default-display__title {
+  margin: auto;
+  text-align: center;
+  font-size: 2rem;
+  font-family: Brush Script MT;
+  font-weight: normal;
+}
+
+.word-info {
+  margin-top: 3rem;
+}
+
+.word-info__main_word {
+  font-size: 4rem;
+}
+
+.word-info__phonetic {
+  font-size: 1.5rem;
+}
+
+.word-info__definitions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.word-info__definition {
+
+}
+
+.word-info__part-of-speech {
+  font-family: Brush Script MT;
+  font-weight: normal;
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.word-info__definition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style-position: inside;
+  padding-left: 1.5rem;
+}
+
+.word-info__definition-item {
+  font-size: 1rem;
+}
+```
+And finally, import the CSS file into our `<WordInfo />` component
+
+```js
+// /src/components/WordInfo.jsx
+
+import './WordInfo.css'
+
+// ... (existing code)
+```
+
+## Conclusion:
+
+Fantastic job! You've successfully created the `<WordInfo />` component to display detailed information about a word. The component now dynamically renders the word, its phonetic pronunciation, and a list of meanings with their respective definitions. In the next segment, we'll focus on making some improvements and conclude the project. Keep up the excellent work!
