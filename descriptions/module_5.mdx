@@ -1,0 +1,225 @@
+
+## Segment Introduction:
+
+In the final segment, "Some Improvements and Conclusion," of the Dictionary Application using React project, we'll focus on enhancing the user experience and handling potential errors. We'll introduce a loading state, improve error handling, and conclude the project with a reflection on the knowledge gained.
+
+## Step-by-Step Guide:
+
+### 1\. Create isLoading State in App Component (`/src/App.jsx`) :
+
+You will notice that there's a slight delay depending on your internet connection between when you click on the search button for a word and when the data is actually displayed. This delay is the time the application is taking to fetch the data from the API. This delay can potentially confuse our users, especially those on a slow internet connection and we want to show the users if the data is currently being loaded and therefore they should wait.
+
+To implement that we will create a isLoading state in our `<App />` component.
+```js
+// /src/App.jsx
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+	const [searchResult, setSearchResult] = useState(null)
+	const [isLoading, setIsLoading] = useState(false) // Create a state named isLoading
+
+	// ... (existing code)
+}
+```
+
+Now we need to modify our `handleSearch` function to first set the value of `isLoading` to true when the function starts executing and change it to false when the data is successfully returned. To do that, change the `handleSearch` function like this
+
+```js
+// /src/App.jsx
+
+// ... (existing code)
+
+const handleSearch = async (e) => {
+	setIsLoading(true)
+	const result = await getDefinitionByWord(searchValue)
+	setSearchResult(result)
+	setIsLoading(false)
+}
+
+// ... (existing code)
+```
+
+### 2\. Pass isLoading as Loading Prop to `<WordInfo />` Component (`/src/App.jsx`) :
+
+We need to show the loading state from the `<WordInfo />` component. For that, the `<WordInfo />` component needs to have access to the `isLoading` state. So we will pass that `isLoading` state as the `loading` prop in our `<WordInfo />` component.
+
+```jsx
+// /src/App.jsx
+
+// ... (existing code)
+
+<WordInfo definition={searchResult} loading={isLoading} />
+
+// ... (existing code)
+```
+At the end, our `<App />` component should look like this:
+
+```jsx
+// /src/App.jsx
+
+import Header from './components/Header.jsx'
+import './App.css'
+import {useState} from 'react'
+import Search from './components/Search.jsx'
+import {getDefinitionByWord} from './lib/getDefinitionByWord.js'
+import WordInfo from './components/WordInfo.jsx'
+
+function App() {
+	const [searchValue, setSearchValue] = useState('')
+	const [searchResult, setSearchResult] = useState(null)
+	const [isLoading, setIsLoading] = useState(false)
+
+	const handleSearch = async (e) => {
+		setIsLoading(true)
+		const result = await getDefinitionByWord(searchValue)
+		setSearchResult(result)
+		setIsLoading(false)
+	}
+
+	return (
+		<main>
+			<Header />
+			<Search searchValue={searchValue} setSearchValue={setSearchValue} onSearch={handleSearch} />
+			<WordInfo definition={searchResult} loading={isLoading} />
+		</main>
+	)
+}
+
+export default App
+```
+
+### 3\. Accept Loading Prop in WordInfo Component and Return Loading State UI (`/src/components/WordInfo.jsx`) :
+
+You know the drill by now. We passed `isLoading` state as `loading` prop to our `<WordInfo />` component. Now we need to accept the `loading` prop from our component. Head to `/src/components/WordInfo.jsx` and you will see our component currently accepts only `definition` prop. Add `loading` prop in there.
+
+Now if you remeber, in the previous segment, we checked if there is no `definition`, we returned a default UI. We have to check if `loading` is true before we check for the availability of `definition` because if the data is still loading there will be no data in `definition` and we still need to show a loading state.
+
+To do that, add this block in the `<WordInfo />` component before we check for `definition`
+
+```js
+// /src/components/WordInfo.jsx
+
+const WordInfo = ({definition, loading}) => {
+	if (loading) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>Loading...</h1>
+		</div>
+	)
+
+	// ... (existing code)
+}
+```
+Now if you search for a word, you will see that there's a loading text before the actual data is being loaded. This small feature greatly enhances the user experience in our application.
+
+### 4\. Change getDefinitionByWord Function for Improved Error Handling (`/src/lib/getDefinitionByWord.js`) :
+
+But we still have a major flaw in our application. If you search for a word that does not exist, the API returns an error and we are not handling it. So our whole application crashes. You can try it yourself. Search a non-existent word and see how the application crashes.
+
+To fix that, we need to check if the response returned from the API has an error, and if it does, we will return a custom error object that will be handled and the error message will be showed to our users from our `<WordInfo />` component. For that let's modify our `getDefinitionByWord` function in `/src/lib/getDefinitionByWord.js`
+
+```js
+// /src/lib/getDefinitionByWord.js
+
+export const getDefinitionByWord = async (word) => {
+	if (!word) return null
+	const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+
+	if (response.ok) return await response.json()
+	else return {
+		error: true,
+		detail: await response.json()
+	}
+}
+```
+Here, if the response is ok, we are returning the response after converting it to json, but if the response is not okay, we are returing a custom object with `error` set to `true` and the response returned from our API which contains more information about our error in `detail` key.
+
+### 5\. Check for Error in WordInfo Component and Return Error State UI (`/src/components/WordInfo.jsx`) :
+
+Now we need to check for error in our `<WordInfo />` component and reurn an error state accordingly. For that, add this block in the `<WordInfo />` componet after we check for the availability of `definition`
+```jsx
+// /src/components/WordInfo.jsx
+
+// ... (existing code)
+
+if (definition.error) return (
+	<div className='default-display'>
+		<h1 className='default-display__title'>{definition.detail.message}</h1>
+	</div>
+)
+
+// ... (existing code)
+```
+
+At the end, our `<WordInfo />` component should look like this
+
+```jsx
+// /src/components/WordInfo.jsx
+
+import './WordInfo.css'
+
+const WordInfo = ({definition, loading}) => {
+	if (loading) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>Loading...</h1>
+		</div>
+	)
+
+	if (!definition) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>Search for a word to get its definition</h1>
+		</div>
+	)
+
+	if (definition.error) return (
+		<div className='default-display'>
+			<h1 className='default-display__title'>{definition.detail.message}</h1>
+		</div>
+	)
+
+	return (
+		<div className="word-info">
+			<h1 className='word-info__main_word'>{definition[0].word}</h1>
+			<p className='word-info__phonetic'>{definition[0].phonetic}</p>
+
+			<div className="word-info__definitions">
+				{definition[0].meanings.map((meaning, index) => (
+					<div key={index} className='word-info__definition'>
+						<h2 className='word-info__part-of-speech'>{meaning.partOfSpeech}</h2>
+						<ul className='word-info__definition-list'>
+							{meaning.definitions.map((def, index) => (
+								<li key={index} className='word-info__definition-item'>{def.definition}</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</div>
+		</div>
+	)
+}
+
+export default WordInfo
+```
+
+### 7\. Add Cursor Pointer Style in Search Component's Submit Button (`/src/components/Search.css`) :
+
+If you notice in our search button, even if we hover over it with our mouse, the curstor does not automatically change to pointer. We need to manually add that styling rule for it to work.
+
+To do that, head to `/src/components/Search.css` and add the following styling rule for the class `.search__button`
+
+```css
+/* /src/components/Search.css */
+
+.search__button {
+  /* Existing stlyes */
+  cursor: pointer;
+}
+```
+And we are basically done with the project
+
+## Conclusion:
+
+Congratulations! You've completed the Dictionary Application using React project successfully. By using React's states and props, creating controlled input field and buttons and fetching data from a third-party API and displaying it, you've gained valuable insights into building robust React applications. Throughout this project, you've honed your skills in state management, asynchronous data fetching, and component styling as well.
+
+In the future, these skills will empower you to create more sophisticated and user-friendly web applications. You've learned how to handle loading states, manage errors gracefully, and present information dynamically—all essential skills for building modern, responsive, and reliable web applications with React.
+
+Keep exploring and building, as the world of web development is ever-evolving. Whether you're continuing your journey in React or diving into other technologies, the principles and techniques you've acquired in this project will undoubtedly serve you well. Happy coding!
